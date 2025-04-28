@@ -8,7 +8,10 @@ export default class CartIcon {
   }
 
   render() {
-    this.elem = createElement('<div class="cart-icon"></div>');
+    this.elem = createElement('<div class="cart-icon"></div>');    
+    this.initialTopCoord = this.elem.getBoundingClientRect().top + window.pageYOffset;
+
+    document.body.append(this.elem);
   }
 
   update(cart) {
@@ -39,6 +42,38 @@ export default class CartIcon {
   }
 
   updatePosition() {
-    // ваш код ...
+    if (!this.elem.offsetWidth) return;
+
+    let screenWidth = window.innerWidth;
+  
+    if (screenWidth <= 767) {
+      this.resetPosition();
+      return;
+    }
+  
+    if (window.pageYOffset > this.initialTopCoord) {
+      let leftIndent = Math.min(
+        document.querySelector('.container').getBoundingClientRect().right + 20,
+        document.documentElement.clientWidth - this.elem.offsetWidth - 10
+      ) + 'px';
+  
+      Object.assign(this.elem.style, {
+        position: 'fixed',
+        top: '50px',
+        zIndex: 1000,
+        left: leftIndent
+      });
+    } else {
+      this.resetPosition();
+    }
+  }
+  
+  resetPosition() {
+    Object.assign(this.elem.style, {
+      position: '',
+      top: '',
+      left: '',
+      zIndex: ''
+    });  
   }
 }

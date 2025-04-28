@@ -19,21 +19,23 @@ export default class StepSlider {
         leftRelative = posClickSlider / this.elem.offsetWidth,
         segments = this.steps - 1,
         approximateValue = leftRelative * segments,
-        value = Math.round(approximateValue),
-        valuePercents = value / segments * 100;
+        value = Math.round(approximateValue);
 
+    // Ограничиваем значение в пределах допустимого диапазона
+    value = Math.max(0, Math.min(segments, value));
 
-        this.value = value;
+    let valuePercents = value / segments * 100;
+
+    this.value = value;
 
     let thumb = this.elem.querySelector('.slider__thumb'),
         progress = this.elem.querySelector('.slider__progress'),
-        valueElem = this.elem.querySelector('.slider__value');
+        valueElem = this.elem.querySelector('.slider__value'),
+        steps = this.elem.querySelectorAll('.slider__steps span');
 
     thumb.style.left = `${valuePercents}%`;
     progress.style.width = `${valuePercents}%`;
     valueElem.textContent = this.value;
-
-    let steps = this.elem.querySelectorAll('.slider__steps span');
 
     steps.forEach(span => span.classList.remove('slider__step-active'));
     steps[this.value].classList.add('slider__step-active');
@@ -56,10 +58,11 @@ export default class StepSlider {
       event.preventDefault();
 
       let sliderRect = this.elem.getBoundingClientRect(),
-          left = (event.clientX - sliderRect.left) / sliderRect.width,
-          leftPercents = left * 100;
+          left = (event.clientX - sliderRect.left) / sliderRect.width;
 
       left = Math.max(0, Math.min(1, left));
+
+      let leftPercents = left * 100;
 
       thumb.style.left = `${leftPercents}%`;
       progress.style.width = `${leftPercents}%`;
@@ -71,13 +74,18 @@ export default class StepSlider {
       document.removeEventListener('pointerup', onPointerUp);
 
       let sliderRect = this.elem.getBoundingClientRect(),
-          left = (event.clientX - sliderRect.left) / sliderRect.width,
-          segments = this.steps - 1,
-          approximateValue = left * segments,
-          value = Math.round(approximateValue),
-          valuePercents = (value / segments) * 100;
+          left = (event.clientX - sliderRect.left) / sliderRect.width;
 
       left = Math.max(0, Math.min(1, left));
+
+      let segments = this.steps - 1,
+          approximateValue = left * segments,
+          value = Math.round(approximateValue);
+
+      // Ограничиваем значение в пределах допустимого диапазона
+      value = Math.max(0, Math.min(segments, value));
+
+      let valuePercents = (value / segments) * 100;
 
       this.value = value;
 
