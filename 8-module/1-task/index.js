@@ -10,8 +10,6 @@ export default class CartIcon {
   render() {
     this.elem = createElement('<div class="cart-icon"></div>');    
     this.initialTopCoord = this.elem.getBoundingClientRect().top + window.pageYOffset;
-
-    document.body.append(this.elem);
   }
 
   update(cart) {

@@ -8,6 +8,7 @@ export default class Cart {
 
   constructor(cartIcon) {
     this.cartIcon = cartIcon;
+    this.modal = null;
 
     this.addEventListeners();
   }
@@ -108,9 +109,8 @@ export default class Cart {
   }
 
   renderModal() {
-    const modal = new Modal();
-
-    modal.setTitle('Your order');
+    this.modal = new Modal();
+    this.modal.setTitle('Your order');
 
     let body = document.createElement('div');
 
@@ -123,8 +123,8 @@ export default class Cart {
 
     body.append(orderForm);
 
-    modal.setBody(body);
-    modal.open();
+    this.modal.setBody(body);
+    this.modal.open();
 
     body.addEventListener('click', (event) => {
       let button = event.target.closest('button');
@@ -157,9 +157,9 @@ export default class Cart {
     let modalBody = document.querySelector('.modal__body');
     
     if (this.isEmpty()) {
-      const modal = document.querySelector('.modal');
+      const modalElem = document.querySelector('.modal');
 
-      if (modal) modal.remove();
+      if (modalElem) modalElem.remove();
 
       document.body.classList.remove('is-modal-open');
 
@@ -189,9 +189,8 @@ export default class Cart {
   onSubmit(event) {
     event.preventDefault();
 
-    let form = event.target,
-      submitButton = form.querySelector('button[type="submit"]');
-
+    let form = event.target;
+    let submitButton = form.querySelector('button[type="submit"]');
     submitButton.classList.add('is-loading');
 
     const formData = new FormData(form);
@@ -202,30 +201,17 @@ export default class Cart {
     })
       .then(response => response.json())
       .then(() => {
-        const modal = Modal.getCurrent ? Modal.getCurrent() : document.querySelector('.modal');
-
-        if (modal) {
-          if (modal.setTitle) {
-            modal.setTitle('Success!');
-          } else {
-            let titleElem = modal.querySelector('.modal__title');
-            
-            if (titleElem) titleElem.textContent = 'Success!';
-          }
-
-          let body = modal.elem ? modal.elem.querySelector('.modal__body') : modal.querySelector('.modal__body');
-
-          if (body) {
-            body.innerHTML = `
-              <div class="modal__body-inner">
-                <p>
-                  Order successful! Your order is being cooked :) <br>
-                  We’ll notify you about delivery time shortly.<br>
-                  <img src="/assets/images/delivery.gif">
-                </p>
-              </div>
-            `;
-          }
+        if (this.modal) {
+          this.modal.setTitle('Success!');
+          this.modal.setBody(createElement(`
+            <div class="modal__body-inner">
+              <p>
+                Order successful! Your order is being cooked :) <br>
+                We’ll notify you about delivery time shortly.<br>
+                <img src="/assets/images/delivery.gif">
+              </p>
+            </div>
+          `));
         }
 
         this.cartItems = [];
@@ -236,7 +222,7 @@ export default class Cart {
       })
       .finally(() => {
         submitButton.classList.remove('is-loading');
-    });
+      });
   };
 
   addEventListeners() {
