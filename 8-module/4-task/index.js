@@ -115,6 +115,8 @@ export default class Cart {
 
     let body = document.createElement('div');
 
+    this.modalBody = body;
+
     this.cartItems.forEach(item => {
       const productElem = this.renderProduct(item.product, item.count);
       body.append(productElem);
@@ -158,8 +160,6 @@ export default class Cart {
     if (this.isEmpty()) {
       this.modal.close();
       this.modalBody = null;
-
-      document.body.classList.remove('is-modal-open');
       
       return;
     }
@@ -204,11 +204,12 @@ export default class Cart {
               </p>
             </div>
           `));
+
+          this.modalBody = null;
         }
 
         this.cartItems = [];
-        this.cartIcon.update(this);
-        this.modalBody = null;
+        this.cartIcon.update(this);        
       })
       .catch(error => {
         console.error('Error submitting order:', error);
