@@ -9,6 +9,7 @@ export default class Cart {
   constructor(cartIcon) {
     this.cartIcon = cartIcon;
     this.modal = null;
+    this.modalBody = null;
 
     this.addEventListeners();
   }
@@ -150,40 +151,31 @@ export default class Cart {
   onProductUpdate(cartItem) {
     this.cartIcon.update(this);
 
-    if (!document.body.classList.contains('is-modal-open')) {
+    if (!document.body.classList.contains('is-modal-open') || !this.modalBody) {
       return;
     }
 
-    let modalBody = document.querySelector('.modal__body');
-    
     if (this.isEmpty()) {
-      const modalElem = document.querySelector('.modal');
-
-      if (modalElem) modalElem.remove();
+      this.modal.close();
+      this.modalBody = null;
 
       document.body.classList.remove('is-modal-open');
-
+      
       return;
     }
 
-    let productId = cartItem.product.id,
-        productElem = modalBody.querySelector(`[data-product-id="${productId}"]`);
+    let productId = cartItem.product.id;
+    let productElem = this.modalBody.querySelector(`[data-product-id="${productId}"]`);
 
     if (productElem) {
-      let productCount = productElem.querySelector('.cart-counter__count'),
-          productPrice = productElem.querySelector('.cart-product__price');
-
-      productCount.innerHTML = cartItem.count;
-      productPrice.innerHTML = `€${(cartItem.product.price * cartItem.count).toFixed(2)}`;
+      productElem.querySelector('.cart-counter__count').innerHTML = cartItem.count;
+      productElem.querySelector('.cart-product__price').innerHTML = `€${(cartItem.product.price * cartItem.count).toFixed(2)}`;
     }
 
-    let infoPrice = modalBody.querySelector(`.cart-buttons__info-price`);
-
+    let infoPrice = this.modalBody.querySelector('.cart-buttons__info-price');
     if (infoPrice) {
       infoPrice.innerHTML = `€${this.getTotalPrice().toFixed(2)}`;
     }
-
-    this.cartIcon.update(this);
   }
 
   onSubmit(event) {
@@ -216,6 +208,7 @@ export default class Cart {
 
         this.cartItems = [];
         this.cartIcon.update(this);
+        this.modalBody = null;
       })
       .catch(error => {
         console.error('Error submitting order:', error);
@@ -229,4 +222,3 @@ export default class Cart {
     this.cartIcon.elem.onclick = () => this.renderModal();
   }
 }
-

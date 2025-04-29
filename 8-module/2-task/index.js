@@ -14,9 +14,8 @@ export default class ProductGrid {
   }
 
   updateFilter(filters) {
-    for (let key in filters) {
-      this.filters[key] = filters[key];
-    }
+    Object.assign(this.filters, filters);
+
     this.#renderProducts();
   }
 
